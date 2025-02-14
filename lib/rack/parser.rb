@@ -22,7 +22,9 @@ module Rack
       type   = Rack::Request.new(env).media_type
       parser = match_content_types_for(parsers, type) if type
       return @app.call(env) unless parser
-      body = env[POST_BODY].read ; env[POST_BODY].rewind
+
+      body = env[POST_BODY].read if env[POST_BODY].respond_to?(:read)
+      env[POST_BODY].rewind if env[POST_BODY].respond_to?(:rewind)
       return @app.call(env) unless body && !body.empty?
       begin
         parsed = parser.last.call body

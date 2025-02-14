@@ -103,7 +103,14 @@ describe Rack::Parser do
     post '/post', payload, { 'CONTENT_TYPE' => 'application/json' }
 
     assert last_response.ok?
-    assert_equal last_request.env['rack.parser.result'], [1, 2, 3]
-    assert_equal last_request.env['rack.request.form_hash'], nil
+    assert_equal [1, 2, 3], last_request.env['rack.parser.result']
+    assert last_request.env['rack.request.form_hash'].nil? || last_request.env['rack.request.form_hash'].empty?
+  end
+
+  it 'allows request for parser with no body' do
+    payload = nil
+    stack Rack::Parser
+    get '/', payload, { 'CONTENT_TYPE' => 'application/json' }
+    assert last_response.ok?
   end
 end
